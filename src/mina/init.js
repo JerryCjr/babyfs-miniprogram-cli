@@ -66,6 +66,11 @@ async function copyOthers(dirPath) {
 }
 
 async function init(dirPath, options) {
+  if (options.newest) {
+    // 删除模板，为了拉取新模板
+    await _.removeDir(templateProject);
+  }
+
   await _.downloadTemplate(config, options.proxy);
 
   const isTemlateExist = await _.checkDirExist(templateProject);
