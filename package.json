@@ -1,9 +1,9 @@
 {
-  "name": "@wechat-miniprogram/miniprogram-cli",
-  "version": "0.0.5",
-  "description": "miniprogram custom component cli",
+  "name": "babyfs-miniprogram-cli",
+  "version": "0.0.7",
+  "description": "babyfs miniprogram custom component cli",
   "bin": {
-    "miniprogram": "src/cli.js"
+    "mina": "src/cli.js"
   },
   "main": "index.js",
   "scripts": {
@@ -11,9 +11,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/wechat-miniprogram/miniprogram-cli.git"
+    "url": "https://github.com/JerryCjr/babyfs-miniprogram-cli.git"
   },
-  "author": "wechat-miniprogram",
+  "author": "Jerry",
   "license": "MIT",
   "devDependencies": {
     "eslint": "^5.3.0",
