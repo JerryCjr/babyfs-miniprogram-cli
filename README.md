@@ -1,4 +1,4 @@
-# miniprogram-cli
+# babyfs-miniprogram-cli
 
 小程序开发相关命令行工具，目前支持以下几种模板：
 
@@ -34,7 +34,7 @@ mina init [options] [dirPath]
 ## 升级
 
 ```
-miniprogram upgrade [options] [dirPath]
+mina upgrade [options] [dirPath]
 ```
 
 根据最新模板对已有项目进行升级。目前仅支持**自定义组件**项目。
@@ -49,7 +49,7 @@ miniprogram upgrade [options] [dirPath]
 ## 缓存
 
 ```
-miniprogram cache [options]
+mina cache [options]
 ```
 
 显示缓存目录。
