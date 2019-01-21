@@ -6,17 +6,18 @@
 * 小程序 quickstart（miniprogram）
 * 小程序插件 quickstart（plugin）
 * 小游戏 quickstart（game）
+* 小程序 mina(gulp webpack)
 
 ## 安装
 
 ```
-npm install -g @wechat-miniprogram/miniprogram-cli
+npm install -g babyfs-miniprogram-cli
 ```
 
 ## 初始化
 
 ```
-miniprogram init [options] [dirPath]
+mina init [options] [dirPath]
 ```
 
 根据模板来进行项目的初始化
