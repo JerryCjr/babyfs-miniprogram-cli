@@ -5,20 +5,17 @@ const fs = require('fs');
 
 const program = require('commander');
 const inquirer = require('inquirer');
+const _ = require('./utils');
 
 const packageConfig = require('../package.json');
-const _ = require('./utils');
 const initCustomComponent = require('./custom-component/init');
 const upgradeCustomComponent = require('./custom-component/upgrade');
 const initQuickstart = require('./quickstart/init');
-const initMinaTemplate = require('./mina/init');
+const initMinaTemplate = require('./mina-template/init');
+const initMinaPureJs = require('./mina-purejs/init');
 
-/**
- * 开始初始化MINA
- */
-const startInitMinaTemplate = function (dirPath, options) {
+function inquirerHandler(dirPath, options, cb) {
   const defaultName = path.basename(dirPath);
-
   inquirer
     .prompt([{
       type: 'input',
@@ -47,48 +44,30 @@ const startInitMinaTemplate = function (dirPath, options) {
       name: 'author',
       message: 'please input the author'
     }])
-    .then(answers => initMinaTemplate(dirPath, Object.assign(options, answers)))
-  // eslint-disable-next-line no-console
+    .then(answers => cb(dirPath, Object.assign(options, answers)))
+    // eslint-disable-next-line no-console
     .catch(err => console.error(err));
-};
+}
+
+/**
+ * 开始初始化MINA-TEMPLATE
+ */
+function startInitMinaTemplate(dirPath, options) {
+  inquirerHandler(dirPath, options, initMinaTemplate);
+}
+
+/**
+ * 开始初始化MINA-PUREJS
+ */
+function startInitMinaPureJs(dirPath, options) {
+  inquirerHandler(dirPath, options, initMinaPureJs);
+}
 
 /**
  * 开始初始化自定义组件
  */
 function startInitCustomComponent(dirPath, options) {
-  const defualtName = path.basename(dirPath);
-
-  inquirer
-    .prompt([{
-      type: 'input',
-      name: 'name',
-      message: 'please input the package name',
-      default: defualtName,
-    }, {
-      type: 'input',
-      name: 'version',
-      message: 'please input the package version',
-      default: '1.0.0',
-      validate(input) {
-        return input.match(/^\d+\.\d+\.\d+$/) ? true : 'the version must be in <number>.<number>.<number> format';
-      },
-    }, {
-      type: 'input',
-      name: 'dist',
-      message: 'please input the miniprogram dist folder',
-      default: 'miniprogram_dist',
-    }, {
-      type: 'input',
-      name: 'git',
-      message: 'please input the git repository url',
-    }, {
-      type: 'input',
-      name: 'author',
-      message: 'please input the author',
-    }])
-    .then(answers => initCustomComponent(dirPath, Object.assign(options, answers)))
-    // eslint-disable-next-line no-console
-    .catch(err => console.error(err));
+  inquirerHandler(dirPath, options, initCustomComponent);
 }
 
 /**
@@ -98,22 +77,38 @@ function startUpgradeCustomComponent(dirPath, options) {
   if (options.force) {
     upgradeCustomComponent(dirPath, options);
   } else {
-    inquirer
-      .prompt([{
-        type: 'checkbox',
-        name: 'override',
-        message: 'which files should be overrided',
-        pageSize: 10,
-        choices: [
-          {name: 'package.json (only override "scripts", "jest" and "devDependencies")', checked: true},
-          {name: 'tools/config.js', checked: true},
-          {name: 'test/utils.js', checked: true},
-          {name: 'other tools files (gulpfile.js, tools/build.js, tools/utils.js, tools/checkcomponents.js, tools/test/*.js)', checked: true},
-          {name: 'other config files (.babelrc, .eslintrc)', checked: true},
-          {name: 'tools/demo'},
-          {name: 'ignore config (.gitignore, .npmignore)'}
-        ]
-      }])
+    inquirer.prompt([{
+      type: 'checkbox',
+      name: 'override',
+      message: 'which files should be overrided',
+      pageSize: 10,
+      choices: [{
+        name: 'package.json (only override "scripts", "jest" and "devDependencies")',
+        checked: true
+      }, {
+        name: 'tools/config.js',
+        checked: true
+      },
+      {
+        name: 'test/utils.js',
+        checked: true
+      },
+      {
+        name: 'other tools files (gulpfile.js, tools/build.js, tools/utils.js, tools/checkcomponents.js, tools/test/*.js)',
+        checked: true
+      },
+      {
+        name: 'other config files (.babelrc, .eslintrc)',
+        checked: true
+      },
+      {
+        name: 'tools/demo'
+      },
+      {
+        name: 'ignore config (.gitignore, .npmignore)'
+      }
+      ]
+    }])
       .then(answers => upgradeCustomComponent(dirPath, Object.assign(options, answers)))
       // eslint-disable-next-line no-console
       .catch(err => console.error(err));
@@ -124,45 +119,33 @@ function startUpgradeCustomComponent(dirPath, options) {
  * 开始初始化
  */
 function startInit(dirPath, options) {
-  if (options.type === 'custom-component') {
-    // 自定义组件
+  function init(cb, filePath) {
     if (options.force) {
-      startInitCustomComponent(dirPath, options);
+      cb(dirPath, options);
     } else {
       try {
-        fs.accessSync(path.join(dirPath, './package.json'));
+        fs.accessSync(path.join(dirPath, filePath));
         // eslint-disable-next-line no-console
         console.log(`project already exists: ${dirPath}`);
       } catch (err) {
-        startInitCustomComponent(dirPath, options);
+        cb(dirPath, options);
       }
     }
-  } else if (options.type === 'mina') {
-    // 自定义组件
-    if (options.force) {
-      startInitMinaTemplate(dirPath, options);
-    } else {
-      try {
-        fs.accessSync(path.join(dirPath, './package.json'));
-        // eslint-disable-next-line no-console
-        console.log(`project already exists: ${dirPath}`);
-      } catch (err) {
-        startInitMinaTemplate(dirPath, options);
-      }
-    }
-  } else {
-    // 其他 quickstart
-    if (options.force) {
-      initQuickstart(dirPath, options);
-    } else {
-      try {
-        fs.accessSync(path.join(dirPath, './project.config.json'));
-        // eslint-disable-next-line no-console
-        console.log(`project already exists: ${dirPath}`);
-      } catch (err) {
-        initQuickstart(dirPath, options);
-      }
-    }
+  }
+
+  switch (options.type) {
+    case 'custom-component':
+      init(startInitCustomComponent, './package.json'); // 自定义组件
+      break;
+    case 'mina-template':
+      init(startInitMinaTemplate, './package.json'); // mina-template
+      break;
+    case 'mina-purejs':
+      init(startInitMinaPureJs, './package.json'); // mina-purejs
+      break;
+    default:
+      init(initQuickstart, './project.config.json'); // 其他quickStart
+      break;
   }
 }
 
@@ -188,14 +171,14 @@ program
 program
   .command('init [dirPath]')
   .description('create a project with template project')
-  .option('-t, --type <type>', 'template project type, only accept "custom-component", "miniprogram", "plugin", "game"')
+  .option('-t, --type <type>', 'template project type, only accept "custom-component", "miniprogram", "plugin", "game" ,"mina-template", "mina-purejs"')
   .option('-f, --force', 'all files will be overrided whether it already exists or not')
   .option('-p, --proxy <url>', 'http/https request proxy')
   .option('-n, --newest', 'use newest template to initialize project')
   .action((dirPath, options) => {
     dirPath = dirPath || process.cwd();
 
-    const choices = ['custom-component', 'miniprogram', 'plugin', 'game', 'mina'];
+    const choices = ['custom-component', 'miniprogram', 'plugin', 'game', 'mina-template', 'mina-purejs'];
 
     if (options.type === 'node' || options.type === 'php') {
       // eslint-disable-next-lint no-console
@@ -243,9 +226,9 @@ program
           default: true,
         }])
         .then(answers => {
+          // eslint-disable-next-line promise/always-return
           if (!answers.force) {
-            // 猜测为非自定义组件项目，仍旧强制升级
-            startUpgrade(dirPath, options);
+            startUpgrade(dirPath, options); // 猜测为非自定义组件项目，仍旧强制升级
           }
         })
         // eslint-disable-next-line no-console

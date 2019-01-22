@@ -1,6 +1,11 @@
 module.exports = {
-  mina: {
-    name: 'mina',
+  minaPureJs: {
+    name: 'mina-purejs',
+    download: 'https://github.com/JerryCjr/babyfs-mina-purejs/archive/master.zip'
+  },
+
+  minaTemplate: {
+    name: 'mina-template',
     download: 'https://github.com/JerryCjr/babyfs-mina-template/archive/master.zip'
   },
 

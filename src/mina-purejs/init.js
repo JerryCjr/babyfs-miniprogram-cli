@@ -1,7 +1,7 @@
 const path = require('path');
 
 const _ = require('../utils');
-const config = require('../config').mina;
+const config = require('../config').minaPureJs;
 
 const now = new Date();
 const templateDir = _.getTemplateDir();
