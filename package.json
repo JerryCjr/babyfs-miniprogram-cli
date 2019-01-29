@@ -1,6 +1,6 @@
 {
   "name": "babyfs-miniprogram-cli",
-  "version": "0.0.7",
+  "version": "1.0.0",
   "description": "babyfs miniprogram custom component cli",
   "bin": {
     "mina": "src/cli.js"

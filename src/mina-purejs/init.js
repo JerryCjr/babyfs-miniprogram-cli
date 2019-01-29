@@ -43,11 +43,12 @@ async function copyOthers(dirPath) {
   // src 目录
   const srcFiles = await _.globSync('src/**/*', globOptions);
 
+  // pages 目录
+  const pagesFiles = await _.globSync('pages/**/*', globOptions);
+
   // test 目录
   const testFiles = await _.globSync('test/**/*', globOptions);
 
-  // tools 目录
-  const toolsFiles = await _.globSync('tools/**/*', globOptions);
 
   const packageJson = /^package\.json$/;
   const license = /^LICENSE$/;
@@ -56,7 +57,7 @@ async function copyOthers(dirPath) {
   let rootFiles = await _.globSync('*', globOptions);
   rootFiles = rootFiles.filter(toolsFile => !toolsFile.match(packageJson) && !toolsFile.match(license));
 
-  const allFiles = [].concat(srcFiles, testFiles, toolsFiles, rootFiles);
+  const allFiles = [].concat(srcFiles, testFiles, pagesFiles, rootFiles);
 
   for (let i = 0, len = allFiles.length; i < len; i++) {
     const filePath = allFiles[i];
