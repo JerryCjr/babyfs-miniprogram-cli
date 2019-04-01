@@ -1,7 +1,7 @@
 const path = require('path');
 
 const _ = require('../utils');
-const config = require('../config').minaPureJs;
+const config = require('../config').minaPurejs;
 
 const now = new Date();
 const templateDir = _.getTemplateDir();
@@ -40,6 +40,15 @@ async function copyLicense(dirPath, options) {
 }
 
 async function copyOthers(dirPath) {
+  // demo 目录
+  const demoFiles = await _.globSync('demo/**/*', globOptions);
+
+  // gulpfile 目录
+  const gulpFiles = await _.globSync('gulpfile.js/**/*', globOptions);
+
+  // tools 目录
+  const toolsFiles = await _.globSync('tools/**/*', globOptions);
+
   // src 目录
   const srcFiles = await _.globSync('src/**/*', globOptions);
 
@@ -57,7 +66,7 @@ async function copyOthers(dirPath) {
   let rootFiles = await _.globSync('*', globOptions);
   rootFiles = rootFiles.filter(toolsFile => !toolsFile.match(packageJson) && !toolsFile.match(license));
 
-  const allFiles = [].concat(srcFiles, testFiles, pagesFiles, rootFiles);
+  const allFiles = [].concat(demoFiles, gulpFiles, srcFiles, toolsFiles, testFiles, pagesFiles, rootFiles);
 
   for (let i = 0, len = allFiles.length; i < len; i++) {
     const filePath = allFiles[i];
