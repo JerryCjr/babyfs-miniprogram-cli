@@ -1,5 +1,5 @@
 module.exports = {
-  minaPureJs: {
+  minaPurejs: {
     name: 'mina-purejs',
     download: 'https://github.com/JerryCjr/babyfs-mina-purejs/archive/master.zip'
   },
@@ -11,7 +11,7 @@ module.exports = {
 
   customComponent: {
     name: 'custom-component',
-    download: 'https://github.com/wechat-miniprogram/miniprogram-custom-component/archive/master.zip',
+    download: 'https://github.com/JerryCjr/babyfs-mina-component/archive/master.zip',
   },
 
   miniprogram: {

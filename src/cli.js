@@ -12,6 +12,7 @@ const initCustomComponent = require('./custom-component/init');
 const upgradeCustomComponent = require('./custom-component/upgrade');
 const initQuickstart = require('./quickstart/init');
 const initMinaTemplate = require('./mina-template/init');
+const minaUpgrade = require('./mina/upgrade');
 const initMinaPureJs = require('./mina-purejs/init');
 
 function inquirerHandler(dirPath, options, cb) {
@@ -153,12 +154,28 @@ function startInit(dirPath, options) {
  * 开始升级
  */
 function startUpgrade(dirPath, options) {
-  try {
-    fs.accessSync(path.join(dirPath, './package.json'));
-    startUpgradeCustomComponent(dirPath, options);
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.log(`project is not a valid custom component project: ${dirPath}`);
+  function next(cb, filePath) {
+    try {
+      fs.accessSync(path.join(dirPath, filePath));
+      cb(dirPath, options);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+      // eslint-disable-next-line no-console
+      console.log(`project is not valid: ${dirPath}`);
+    }
+  }
+  switch (options.type) {
+    case 'custom-component':
+      next(startUpgradeCustomComponent, './package.json'); // 自定义组件
+      break;
+    case 'mina-template':
+    case 'mina-purejs':
+      next(minaUpgrade, './package.json');
+      break;
+    default:
+      next(startUpgradeCustomComponent, './package.json'); // 自定义组件
+      break;
   }
 }
 
@@ -181,7 +198,7 @@ program
     const choices = ['custom-component', 'miniprogram', 'plugin', 'game', 'mina-template', 'mina-purejs'];
 
     if (options.type === 'node' || options.type === 'php') {
-      // eslint-disable-next-lint no-console
+      // eslint-disable-next-line no-console
       console.log(`template project [ ${options.type} ] has been deprecated`);
     }
 
@@ -215,26 +232,22 @@ program
   .action((dirPath, options) => {
     dirPath = dirPath || process.cwd();
 
-    try {
-      fs.accessSync(path.join(dirPath, './project.config.json'));
-
+    const choices = ['custom-component', 'mina-template', 'mina-purejs'];
+    if (!options.type || choices.indexOf(options.type) < 0) {
+      // 未指定类型，则发起询问
       inquirer
         .prompt([{
-          type: 'confirm',
-          name: 'force',
-          message: 'this project doesn\'t look like a custom component project, is it stop upgrading?',
-          default: true,
+          type: 'list',
+          name: 'type',
+          message: 'which type of project want to use to initialize',
+          default: 'custom-component',
+          choices,
         }])
-        .then(answers => {
-          // eslint-disable-next-line promise/always-return
-          if (!answers.force) {
-            startUpgrade(dirPath, options); // 猜测为非自定义组件项目，仍旧强制升级
-          }
-        })
+        .then(answers => startUpgrade(dirPath, Object.assign(options, answers)))
         // eslint-disable-next-line no-console
         .catch(err => console.error(err));
-    } catch (err) {
-      // ignore
+    } else {
+      // 已指定类型
       startUpgrade(dirPath, options);
     }
   });
